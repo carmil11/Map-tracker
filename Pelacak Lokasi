@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pelacak Lokasi Ponsel</title>
+    <script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-database.js"></script>
+</head>
+<body>
+    <h1>Pelacak Lokasi Ponsel</h1>
+
+    <script>
+        // Konfigurasi Firebase
+       const firebaseConfig = {
+  apiKey: "AIzaSyBduYfOHBd0jPV8Dle7C7iggUEVT0xcikA",
+  authDomain: "maps-tracker-d7edc.firebaseapp.com",
+  databaseURL: "https://maps-tracker-d7edc-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "maps-tracker-d7edc",
+  storageBucket: "maps-tracker-d7edc.appspot.com",
+  messagingSenderId: "10049825881",
+  appId: "1:10049825881:web:66cd83ef1403578bfe1548",
+  measurementId: "G-Q0GW7V7TMF"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+
+        // Meminta dan mengirimkan data lokasi secara real-time
+        function updateLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.watchPosition((position) => {
+                    const lat = position.coords.latitude;
+                    const long = position.coords.longitude;
+                    const accuracy = position.coords.accuracy;
+
+                    // Kirim data lokasi ke Firebase
+                    firebase.database().ref('tracking/location').set({
+                        latitude: lat,
+                        longitude: long,
+                        accuracy: accuracy,
+                        timestamp: Date.now()
+                    });
+                    console.log("Data lokasi dikirim: ", lat, long);
+                }, (error) => {
+                    console.error("Gagal mendapatkan lokasi: ", error);
+                });
+            } else {
+                console.error("Geolokasi tidak didukung oleh browser ini.");
+            }
+        }
+
+        updateLocation();
+    </script>
+</body>
+</html>
