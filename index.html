@@ -23,7 +23,8 @@
           messagingSenderId: "10049825881",
           appId: "1:10049825881:web:66cd83ef1403578bfe1548",
           measurementId: "G-Q0GW7V7TMF"
-};
+        };
+
         // Inisialisasi Firebase
         const app = firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
@@ -48,6 +49,8 @@
                         const latitude = position.coords.latitude;
                         const longitude = position.coords.longitude;
 
+                        console.log(Latitude: ${latitude}, Longitude: ${longitude});
+                        
                         // Update lokasi ke Firebase
                         database.ref('locations/user1').set({
                             latitude: latitude,
