@@ -4,80 +4,84 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aplikasi Pelacak Lokasi</title>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js"></script>
+    <!-- Tambahkan Firebase -->
+    <script type="module">
+        // Import modul Firebase yang diperlukan
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
+        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js";
+
+        // Konfigurasi Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBduYfOHBd0jPV8Dle7C7iggUEVT0xcikA",
+            authDomain: "maps-tracker-d7edc.firebaseapp.com",
+            databaseURL: "https://maps-tracker-d7edc-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "maps-tracker-d7edc",
+            storageBucket: "maps-tracker-d7edc.firebasestorage.app",
+            messagingSenderId: "10049825881",
+            appId: "1:10049825881:web:66cd83ef1403578bfe1548",
+            measurementId: "G-Q0GW7V7TMF"
+        };
+
+        // Inisialisasi Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const startTrackingButton = document.getElementById('startTracking');
+            const statusElement = document.getElementById('status');
+
+            // Tambahkan event listener ke tombol
+            startTrackingButton.addEventListener('click', () => {
+                console.log("Tombol Mulai Pelacakan diklik.");
+                statusElement.textContent = "Status: Melacak lokasi...";
+                updateLocation();
+            });
+
+            // Fungsi untuk melacak dan memperbarui lokasi
+            function updateLocation() {
+                if (navigator.geolocation) {
+                    console.log("Geolocation tersedia.");
+                    navigator.geolocation.watchPosition(
+                        (position) => {
+                            const latitude = position.coords.latitude;
+                            const longitude = position.coords.longitude;
+
+                            console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
+
+                            // Update lokasi ke Firebase
+                            const locationRef = ref(database, 'locations/user1');
+                            set(locationRef, {
+                                latitude: latitude,
+                                longitude: longitude
+                            }).then(() => {
+                                console.log(`Lokasi diperbarui: ${latitude}, ${longitude}`);
+                                statusElement.textContent = `Status: Lokasi diperbarui (${latitude}, ${longitude}).`;
+                            }).catch((error) => {
+                                console.error("Gagal memperbarui lokasi di Firebase:", error);
+                                statusElement.textContent = "Status: Gagal memperbarui lokasi.";
+                            });
+                        },
+                        (error) => {
+                            console.error("Gagal mendapatkan lokasi:", error);
+                            statusElement.textContent = "Status: Gagal mendapatkan lokasi.";
+                        },
+                        {
+                            enableHighAccuracy: true, // Gunakan lokasi presisi tinggi
+                            maximumAge: 0,          // Tidak menggunakan cache
+                            timeout: 27000          // Waktu tunggu maksimal
+                        }
+                    );
+                } else {
+                    console.log("Geolocation tidak didukung oleh browser.");
+                    statusElement.textContent = "Status: Geolocation tidak didukung.";
+                }
+            }
+        });
+    </script>
 </head>
 <body>
     <h1>Pelacak Lokasi</h1>
     <button id="startTracking">Mulai Pelacakan</button>
     <p id="status">Status: Menunggu...</p>
-
-    <script>
-        // Konfigurasi Firebase
-        const firebaseConfig = {
-          apiKey: "AIzaSyBduYfOHBd0jPV8Dle7C7iggUEVT0xcikA",
-          authDomain: "maps-tracker-d7edc.firebaseapp.com",
-          databaseURL: "https://maps-tracker-d7edc-default-rtdb.asia-southeast1.firebasedatabase.app",
-          projectId: "maps-tracker-d7edc",
-          storageBucket: "maps-tracker-d7edc.firebasestorage.app",
-          messagingSenderId: "10049825881",
-          appId: "1:10049825881:web:66cd83ef1403578bfe1548",
-          measurementId: "G-Q0GW7V7TMF"
-        };
-
-        // Inisialisasi Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-
-        // Referensi elemen HTML
-        const startTrackingButton = document.getElementById('startTracking');
-        const statusElement = document.getElementById('status');
-
-        // Tambahkan event listener ke tombol
-        startTrackingButton.addEventListener('click', () => {
-            console.log("Tombol Mulai Pelacakan diklik.");
-            statusElement.textContent = "Status: Melacak lokasi...";
-            updateLocation();
-        });
-
-        // Fungsi untuk melacak dan memperbarui lokasi
-        function updateLocation() {
-            if (navigator.geolocation) {
-                console.log("Geolocation tersedia.");
-                navigator.geolocation.watchPosition(
-                    (position) => {
-                        const latitude = position.coords.latitude;
-                        const longitude = position.coords.longitude;
-
-                        console.log(Latitude: ${latitude}, Longitude: ${longitude});
-                        
-                        // Update lokasi ke Firebase
-                        database.ref('locations/user1').set({
-                            latitude: latitude,
-                            longitude: longitude
-                        }).then(() => {
-                            console.log(Lokasi diperbarui: ${latitude}, ${longitude});
-                            statusElement.textContent = Status: Lokasi diperbarui (${latitude}, ${longitude}).;
-                        }).catch((error) => {
-                            console.error("Gagal memperbarui lokasi di Firebase:", error);
-                            statusElement.textContent = "Status: Gagal memperbarui lokasi.";
-                        });
-                    },
-                    (error) => {
-                        console.error("Gagal mendapatkan lokasi:", error);
-                        statusElement.textContent = "Status: Gagal mendapatkan lokasi.";
-                    },
-                    {
-                        enableHighAccuracy: true, // Gunakan lokasi presisi tinggi
-                        maximumAge: 0,          // Tidak menggunakan cache
-                        timeout: 27000          // Waktu tunggu maksimal
-                    }
-                );
-            } else {
-                console.log("Geolocation tidak didukung oleh browser.");
-                statusElement.textContent = "Status: Geolocation tidak didukung.";
-            }
-        }
-    </script>
 </body>
 </html>
